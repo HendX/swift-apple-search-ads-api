@@ -11,7 +11,13 @@ public actor APIProvider {
     ///
     /// - Parameters:
     ///     - configuration: API configuration parameters.
-    public init(configuration: APIConfiguration) {
+    ///     - backoffBehavior: Retry behavior for server errors (429, 500-599).
+    ///                        Defaults to `.onRetryableError` (5 retries with exponential backoff).
+    ///                        Use `.none` to disable retries, or `.onRetryableError(maxAttempts:)` to customize.
+    public init(
+        configuration: APIConfiguration,
+        backoffBehavior: ExponentialBackoffBehavior = .onRetryableError
+    ) {
         let accessTokenStore = AccessTokenStore(
             configuration: configuration,
             jwtAudience: "https://appleid.apple.com"
@@ -29,7 +35,7 @@ public actor APIProvider {
                 AuthorizationInjector { try await accessTokenStore.token().model }
             ],
             retryBehavior: .onUnauthorized(accessTokenStore),
-            exponentialBackoffBehavior: .onRetryableError
+            exponentialBackoffBehavior: backoffBehavior
         )
         self.configuration = configuration
         self.accessTokenStore = accessTokenStore
