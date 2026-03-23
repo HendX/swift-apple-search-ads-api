@@ -58,6 +58,16 @@ public struct AdGroup: Codable, Hashable, Sendable, CodingKeysContaining, Identi
         case pendingAudienceVerification = "PENDING_AUDIENCE_VERIFICATION"
         /// The targeting parameters are inaccurate.
         case targetedDeviceClassNotSupportedSupplySource = "TARGETED_DEVICE_CLASS_NOT_SUPPORTED_SUPPLY_SOURCE"
+        /// Automated keywords required ad group not allowed in manual campaigns.
+        case automatedKeywordsRequiredAdGroupNotAllowedInManualCampaigns = "AUTOMATED_KEYWORDS_REQUIRED_AD_GROUP_NOT_ALLOWED_IN_MANUAL_CAMPAIGNS"
+        /// An unknown serving state reason not yet defined in the client.
+        case unknown = "__UNKNOWN__"
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let rawValue = try container.decode(String.self)
+            self = ServingStateReasons(rawValue: rawValue) ?? .unknown
+        }
     }
 
     /// The unique identifier for the ad group that you can use as adGroupId in endpoint resources.
